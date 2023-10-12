@@ -1,10 +1,14 @@
 import './App.css';
 import LogIn from './Pages/LogIn';
+import { ThemeProvider } from '@mui/material';
+import theme from './theme';
 
 function App() {
   return (
     <div className="App">
-      <LogIn/>
+      <ThemeProvider theme={theme}>
+        <LogIn/>
+      </ThemeProvider>
     </div>
   );
 }
