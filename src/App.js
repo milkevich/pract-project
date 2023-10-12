@@ -1,10 +1,10 @@
 import './App.css';
-import { TextField } from '@mui/material';
+import LogIn from './Pages/LogIn';
 
 function App() {
   return (
     <div className="App">
-      <TextField sx={{position: 'relative', marginTop: '100px'}} id="outlined-basic" label="Outlined" variant="outlined"></TextField>
+      <LogIn/>
     </div>
   );
 }
