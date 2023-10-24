@@ -9,6 +9,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Container from "@mui/material/Container";
 import { Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { Link } from "react-router-dom/cjs/react-router-dom";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -44,7 +45,11 @@ const Posts = () => {
   };
 
   return (
-    <Container maxWidth="sm">
+    <div>
+      <Link className='router-log-out' to={{pathname: '/'}}>
+        Log Out
+      </Link>
+      <Container maxWidth="sm">
       {posts.map((post, index) => {
         return (
           <div key={index} style={{ display: "flex", flexDirection: "column" }}>
@@ -111,6 +116,7 @@ const Posts = () => {
         Load More
       </Button>
     </Container>
+    </div>
   );
 };
 

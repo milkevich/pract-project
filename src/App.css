@@ -36,3 +36,22 @@
 .post-buttons {
   margin-bottom: 10px;
 }
+
+.router-link {
+  text-decoration: none;
+  color: white;
+}
+
+.router-log-out {
+  position: fixed;
+  top: 50px;
+  left: 50px;
+  text-decoration: none;
+  color: #000000;
+  z-index: 999;
+  cursor: pointer;
+}
+
+.router-log-out:hover {
+  text-decoration: underline;
+}

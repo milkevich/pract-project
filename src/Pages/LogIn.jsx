@@ -3,6 +3,7 @@ import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom/cjs/react-router-dom';
 
 function LogIn() {
   const [email, setEmail] = useState('');
@@ -81,9 +82,10 @@ function LogIn() {
           onClick={submit}
           sx={{ position: 'relative', marginTop: '20px', width: '300px' }}
           variant="contained"
-          disabled={!formReady}
-        >
-          Log In
+          disabled={!formReady}>
+          <Link className='router-link' to={{pathname: '/posts'}}>
+            Log In
+          </Link>
         </Button>
       </Container>
     </div>
