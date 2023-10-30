@@ -2,8 +2,10 @@ import './App.css';
 import LogIn from './Pages/LogIn';
 import { ThemeProvider } from '@mui/material';
 import theme from './theme';
-import Posts from './Posts';
+import Posts from './Pages/Posts';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
+
+cd 
 
 
 function App() {
