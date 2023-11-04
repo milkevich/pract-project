@@ -3,7 +3,11 @@ import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom/cjs/react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../firebaseConfig';
+
+
 
 function LogIn() {
   const [email, setEmail] = useState('');
@@ -12,11 +16,27 @@ function LogIn() {
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
-  const [formReady, setFormReady] = useState(false);
 
-  useEffect(() => {
-    setFormReady(!emailError && !passwordError && (email !== '' && password !== ''));
-  }, [email, password, emailError, passwordError]);
+  const navigate = useNavigate()
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!emailError || !passwordError) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log(user)
+          if(user.uid==='uDCaUeEVX9T1mxu763JUwO0aUNA2'){
+            navigate('/posts')
+          }
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(error)
+        });
+    }
+  };
 
   const emailValidation = (e) => {
     const pattern = /^[^]+@[^]+\.[a-z]{2,3}$/;
@@ -42,13 +62,6 @@ function LogIn() {
     } else {
       setPasswordError(false);
       setPasswordErrorMessage('');
-    }
-  };
-
-  const submit = (e) => {
-    e.preventDefault();
-    if (!emailError || !passwordError) {
-      alert('велкам ❤️');
     }
   };
 
@@ -81,11 +94,8 @@ function LogIn() {
         <Button
           onClick={submit}
           sx={{ position: 'relative', marginTop: '20px', width: '300px' }}
-          variant="contained"
-          disabled={!formReady}>
-          <Link className='router-link' to={{pathname: '/posts'}}>
-            Log In
-          </Link>
+          variant="contained">
+          Log In
         </Button>
       </Container>
     </div>
