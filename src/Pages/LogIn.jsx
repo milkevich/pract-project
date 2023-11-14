@@ -2,11 +2,10 @@ import { TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
-import { useState, useEffect } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../firebaseConfig';
-
 
 
 function LogIn() {
@@ -23,12 +22,8 @@ function LogIn() {
     e.preventDefault();
     if (!emailError || !passwordError) {
       signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          console.log(user)
-          if(user.uid==='uDCaUeEVX9T1mxu763JUwO0aUNA2'){
-            navigate('/posts')
-          }
+        .then(() => {
+          navigate('/posts')
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -65,6 +60,10 @@ function LogIn() {
     }
   };
 
+  const goToPosts = () => {
+    navigate("/posts")
+  }
+
   return (
     <div>
       <CssBaseline />
@@ -96,6 +95,12 @@ function LogIn() {
           sx={{ position: 'relative', marginTop: '20px', width: '300px' }}
           variant="contained">
           Log In
+        </Button>
+        <Button
+          onClick={goToPosts}
+          sx={{ position: 'relative', marginTop: '20px', width: '300px' }}
+          variant="text">
+              Go Back 
         </Button>
       </Container>
     </div>

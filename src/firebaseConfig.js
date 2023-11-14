@@ -1,5 +1,6 @@
-import { getAuth } from "firebase/auth"
-import { initializeApp } from 'firebase/app';
+import { getAuth } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, push, onValue, runTransaction, set } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBQ0sleHQM9IQiR7TfKS86PmSpK-QJHC9w",
@@ -12,12 +13,34 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app)
+const database = getDatabase(app);
+const auth = getAuth(app);
 
-// Get a list of cities from your database
-async function getCities(db) {
-  const citiesCol = collection(db, 'cities');
-  const citySnapshot = await getDocs(citiesCol);
-  const cityList = citySnapshot.docs.map(doc => doc.data());
-  return cityList;
+export { database, auth, ref, onValue };
+
+export function addNewPost(title, mainDescription, secondaryDescription) {
+
+  set(ref(database, `posts/${postId}`), {
+    likes: 0,
+    title,
+    mainDescription,
+    secondaryDescription
+  });
+}
+
+const newPostRef = ref(database, 'posts'); 
+const newPost = push(newPostRef);
+const postId = newPost.key; 
+
+
+export function toggleLike() {
+  const postLikesRef = ref(database, `posts/${postId}/likes`);
+
+  runTransaction(postLikesRef, (currentLikes) => {
+    return currentLikes ? currentLikes - 1 : 1; 
+  }).then(() => {
+    console.log('like toggled post ID:', postId);
+  }).catch((error) => {
+    console.error('u suck:', postId, error);
+  });
 }
