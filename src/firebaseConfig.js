@@ -33,7 +33,7 @@ const newPost = push(newPostRef);
 const postId = newPost.key; 
 
 
-export function toggleLike() {
+export function toggleLike(postId) {
   const postLikesRef = ref(database, `posts/${postId}/likes`);
 
   runTransaction(postLikesRef, (currentLikes) => {
