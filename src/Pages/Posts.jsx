@@ -17,6 +17,7 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import { addNewPost, toggleLike, database, onValue, ref } from "../firebaseConfig";
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import PopUp from "./CreateNewPost";
+import { push } from "firebase/database";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -60,8 +61,11 @@ const Posts = () => {
     setExpanded(updatedExpanded);
   };
 
-  const handleLikeClick = (postId) => {
+  const handleLikeClick = (index, postId) => {
     toggleLike(postId);
+    const updatedLiked = [...liked];
+    updatedLiked[index] = !liked[index];
+    setLiked(updatedLiked);
   };
 
   const handleLoadMore = () => {

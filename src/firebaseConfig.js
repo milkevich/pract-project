@@ -19,6 +19,9 @@ const auth = getAuth(app);
 export { database, auth, ref, onValue };
 
 export function addNewPost(title, mainDescription, secondaryDescription) {
+  const postsRef = ref(database, 'posts'); 
+  const newPostRef = push(postsRef);
+  const postId = newPostRef.key;
 
   set(ref(database, `posts/${postId}`), {
     likes: 0,
@@ -27,11 +30,6 @@ export function addNewPost(title, mainDescription, secondaryDescription) {
     secondaryDescription
   });
 }
-
-const newPostRef = ref(database, 'posts'); 
-const newPost = push(newPostRef);
-const postId = newPost.key; 
-
 
 export function toggleLike(postId) {
   const postLikesRef = ref(database, `posts/${postId}/likes`);
