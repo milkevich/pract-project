@@ -1,6 +1,7 @@
 import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, push, onValue, runTransaction, set } from "firebase/database";
+import { increment } from "firebase/database"
 
 const firebaseConfig = {
   apiKey: "AIzaSyBQ0sleHQM9IQiR7TfKS86PmSpK-QJHC9w",
@@ -19,7 +20,7 @@ const auth = getAuth(app);
 export { database, auth, ref, onValue };
 
 export function addNewPost(title, mainDescription, secondaryDescription) {
-  const postsRef = ref(database, 'posts'); 
+  const postsRef = ref(database, 'posts');
   const newPostRef = push(postsRef);
   const postId = newPostRef.key;
 
@@ -33,12 +34,30 @@ export function addNewPost(title, mainDescription, secondaryDescription) {
 
 export function toggleLike(postId) {
   const postLikesRef = ref(database, `posts/${postId}/likes`);
-
   runTransaction(postLikesRef, (currentLikes) => {
-    return currentLikes ? currentLikes - 1 : 1; 
-  }).then(() => {
-    console.log('like toggled post ID:', postId);
-  }).catch((error) => {
-    console.error('u suck:', postId, error);
+    currentLikes = currentLikes || 0;
+
+    const newLikes = currentLikes === 0 ? 1 : increment(-1);
+
+    return newLikes;
+  })
+  .then(() => {
+    console.log('Like toggled, post ID:', postId);
+  })
+  .catch((error) => {
+    console.error('Error toggling like, post ID:', postId, error);
   });
 }
+
+export function likeCheck(postId) {
+  const postLikesRef = ref(database, `posts/${postId}/likes`);
+
+  return new Promise((resolve) => {
+    onValue(postLikesRef, (snapshot) => {
+      const currentLikes = snapshot.val();
+      const isLiked = currentLikes > 0;
+      resolve(isLiked);
+    });
+  });
+}
+

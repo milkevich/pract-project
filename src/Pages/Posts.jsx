@@ -17,7 +17,7 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import { addNewPost, toggleLike, database, onValue, ref } from "../firebaseConfig";
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import PopUp from "./CreateNewPost";
-import { push } from "firebase/database";
+import { likeCheck } from "../firebaseConfig";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -33,8 +33,8 @@ const ExpandMore = styled((props) => {
 const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [expanded, setExpanded] = useState([]);
-  const [liked, setLiked] = useState([]);
-  const [postsAmount, setPostsAmount] = useState(5)
+  const [likes, setLikes] = useState({});
+  const [postsAmount, setPostsAmount] = useState(5);
   const [popUpOpen, setPopUpOpen] = useState(false);
   const { theme, changeTheme } = useThemeContext();
 
@@ -50,10 +50,22 @@ const Posts = () => {
         }));
         setPosts(postsArray);
         setExpanded(Array(postsArray.length).fill(false));
-        setLiked(Array(postsArray.length).fill(false));
       }
     });
   }, []);
+
+  useEffect(() => {
+    const fetchLikes = async () => {
+      const likesData = {};
+      for (const post of posts) {
+        const isLiked = await likeCheck(post.id);
+        likesData[post.id] = isLiked;
+      }
+      setLikes(likesData);
+    };
+
+    fetchLikes();
+  }, [posts]); 
 
   const handleExpandClick = (index) => {
     const updatedExpanded = [...expanded];
@@ -61,11 +73,10 @@ const Posts = () => {
     setExpanded(updatedExpanded);
   };
 
-  const handleLikeClick = (index, postId) => {
-    toggleLike(postId);
-    const updatedLiked = [...liked];
-    updatedLiked[index] = !liked[index];
-    setLiked(updatedLiked);
+  const handleLikeClick = async (index, postId) => {
+    await toggleLike(postId);
+    const isLiked = await likeCheck(postId);
+    setLikes((prevLikes) => ({ ...prevLikes, [postId]: isLiked }));
   };
 
   const handleLoadMore = () => {
@@ -255,7 +266,7 @@ const Posts = () => {
       </Link>
       <Container maxWidth="sm">
         {popUpOpen ? <PopUp open={popUpOpen} onClose={handleClosePopUp} /> : console.log(popUpOpen)}
-        
+
         {posts.slice(0, postsAmount).map((post, index) => {
           return (
             <div key={index} style={styles.listContainer}>
@@ -283,11 +294,11 @@ const Posts = () => {
                   sx={{
                     borderRadius: 2,
                     border: 1,
-                    borderColor: liked[index] ? '#cd74d4' : '#c1c1c1',
-                    color: liked[index] ? "#cd74d4" : '#c1c1c1',
-                    bgcolor: liked[index] ? 'rgba(255, 0, 247, 0.050)' : 'transparent',
+                    borderColor: likes[post.id] ? '#cd74d4' : '#c1c1c1',
+                    color: likes[post.id] ? "#cd74d4" : '#c1c1c1',
+                    bgcolor: likes[post.id] ? 'rgba(255, 0, 247, 0.050)' : 'transparent',
                     "&:hover": {
-                      bgcolor: liked[index] ? 'rgba(255, 0, 247, 0.150)' : 'transparent',
+                      bgcolor: likes[post.id] ? 'rgba(255, 0, 247, 0.150)' : 'transparent',
                     },
                   }}
                   onClick={() => handleLikeClick(index, post.id)}
@@ -326,7 +337,7 @@ const Posts = () => {
             }}
             variant="text"
             onClick={handleLoadMore}
-            
+
           >
             Load More
           </Button>
