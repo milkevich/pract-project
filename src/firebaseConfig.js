@@ -1,6 +1,6 @@
 import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, push, onValue, runTransaction, set } from "firebase/database";
+import { getDatabase, ref, push, onValue, get, set } from "firebase/database";
 import { increment } from "firebase/database"
 
 const firebaseConfig = {
@@ -32,21 +32,52 @@ export function addNewPost(title, mainDescription, secondaryDescription) {
   });
 }
 
-export function toggleLike(postId) {
+export function getCurrentUserId() {
+  const user = auth.currentUser;
+  return user ? user.uid : null;
+}
+
+export async function toggleLike(postId) {
+  const userId = getCurrentUserId();
+
+  if (!userId) {
+    console.error('User not authenticated');
+    return;
+  }
+
   const postLikesRef = ref(database, `posts/${postId}/likes`);
-  runTransaction(postLikesRef, (currentLikes) => {
-    currentLikes = currentLikes || 0;
+  const userLikesRef = ref(database, `users/${userId}/likes/${postId}`);
 
-    const newLikes = currentLikes === 0 ? 1 : increment(-1);
+  try {
+    const postLikesSnapshot = await get(postLikesRef);
+    const userLiked = await get(userLikesRef);
 
-    return newLikes;
-  })
-  .then(() => {
-    console.log('Like toggled, post ID:', postId);
-  })
-  .catch((error) => {
-    console.error('Error toggling like, post ID:', postId, error);
-  });
+    const postLikes = postLikesSnapshot.val() || 0;
+
+    if (userLiked.val()) {
+      await set(postLikesRef, postLikes - 1);
+      await set(userLikesRef, null); 
+    } else {
+      await set(postLikesRef, postLikes + 1);
+      await set(userLikesRef, true);
+    }
+
+    console.log('Like toggled, post ID:', postId, 'for User ID:', userId);
+  } catch (error) {
+    console.error('Error toggling like, post ID:', postId, 'for User ID:', userId, error);
+  }
+}
+
+export function getLikedPosts() {
+  const userId = getCurrentUserId();
+
+  if (!userId) {
+    console.error('User not authenticated');
+    return null;
+  }
+
+  const userLikesRef = ref(database, `users/${userId}/likes`);
+  return onValue(userLikesRef);
 }
 
 export function likeCheck(postId) {
@@ -60,4 +91,3 @@ export function likeCheck(postId) {
     });
   });
 }
-
