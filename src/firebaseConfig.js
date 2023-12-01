@@ -1,7 +1,6 @@
 import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, push, onValue, get, set } from "firebase/database";
-import { increment } from "firebase/database"
+import { getDatabase, ref, push, onValue, get, set, update, increment } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBQ0sleHQM9IQiR7TfKS86PmSpK-QJHC9w",
@@ -30,54 +29,6 @@ export function addNewPost(title, mainDescription, secondaryDescription) {
     mainDescription,
     secondaryDescription
   });
-}
-
-export function getCurrentUserId() {
-  const user = auth.currentUser;
-  return user ? user.uid : null;
-}
-
-export async function toggleLike(postId) {
-  const userId = getCurrentUserId();
-
-  if (!userId) {
-    console.error('User not authenticated');
-    return;
-  }
-
-  const postLikesRef = ref(database, `posts/${postId}/likes`);
-  const userLikesRef = ref(database, `users/${userId}/likes/${postId}`);
-
-  try {
-    const postLikesSnapshot = await get(postLikesRef);
-    const userLiked = await get(userLikesRef);
-
-    const postLikes = postLikesSnapshot.val() || 0;
-
-    if (userLiked.val()) {
-      await set(postLikesRef, postLikes - 1);
-      await set(userLikesRef, null); 
-    } else {
-      await set(postLikesRef, postLikes + 1);
-      await set(userLikesRef, true);
-    }
-
-    console.log('Like toggled, post ID:', postId, 'for User ID:', userId);
-  } catch (error) {
-    console.error('Error toggling like, post ID:', postId, 'for User ID:', userId, error);
-  }
-}
-
-export function getLikedPosts() {
-  const userId = getCurrentUserId();
-
-  if (!userId) {
-    console.error('User not authenticated');
-    return null;
-  }
-
-  const userLikesRef = ref(database, `users/${userId}/likes`);
-  return onValue(userLikesRef);
 }
 
 export function likeCheck(postId) {
