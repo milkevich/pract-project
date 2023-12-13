@@ -2,8 +2,11 @@ import { TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom/cjs/react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../firebaseConfig';
+
 
 function LogIn() {
   const [email, setEmail] = useState('');
@@ -12,11 +15,23 @@ function LogIn() {
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
-  const [formReady, setFormReady] = useState(false);
 
-  useEffect(() => {
-    setFormReady(!emailError && !passwordError && (email !== '' && password !== ''));
-  }, [email, password, emailError, passwordError]);
+  const navigate = useNavigate()
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!emailError || !passwordError) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          navigate('/posts')
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(error)
+        });
+    }
+  };
 
   const emailValidation = (e) => {
     const pattern = /^[^]+@[^]+\.[a-z]{2,3}$/;
@@ -45,12 +60,9 @@ function LogIn() {
     }
   };
 
-  const submit = (e) => {
-    e.preventDefault();
-    if (!emailError || !passwordError) {
-      alert('велкам ❤️');
-    }
-  };
+  const goToPosts = () => {
+    navigate("/posts")
+  }
 
   return (
     <div>
@@ -81,11 +93,14 @@ function LogIn() {
         <Button
           onClick={submit}
           sx={{ position: 'relative', marginTop: '20px', width: '300px' }}
-          variant="contained"
-          disabled={!formReady}>
-          <Link className='router-link' to={{pathname: '/posts'}}>
-            Log In
-          </Link>
+          variant="contained">
+          Log In
+        </Button>
+        <Button
+          onClick={goToPosts}
+          sx={{ position: 'relative', marginTop: '20px', width: '300px' }}
+          variant="text">
+              Go Back 
         </Button>
       </Container>
     </div>

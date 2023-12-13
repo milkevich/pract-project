@@ -1,5 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 import { red } from '@mui/material/colors';
+import { useThemeContext } from "./Contexts/ThemeContext"
 
 const theme = createTheme({
   palette: {
