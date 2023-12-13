@@ -14,7 +14,7 @@ import { useThemeContext } from "../Contexts/ThemeContext";
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
-import { addNewPost, database, onValue, ref } from "../firebaseConfig";
+import { database, onValue, ref } from "../firebaseConfig";
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import PopUp from "./CreateNewPost";
 import { likeCheck } from "../firebaseConfig";
@@ -41,6 +41,11 @@ const Posts = () => {
   const { theme, changeTheme } = useThemeContext();
 
   useEffect(() => {
+    const likedPosts = JSON.parse(localStorage.getItem('likedPosts'));
+    setLikes(likedPosts || {});
+  }, []);
+
+  useEffect(() => {
     const postsRef = ref(database, "posts/");
 
     onValue(postsRef, (snapshot) => {
@@ -56,21 +61,20 @@ const Posts = () => {
     });
   }, []);
 
-  useEffect(() => {
-    const likedPosts = JSON.parse(localStorage.getItem('likedPosts'));
-    setLikes(likedPosts || {});
-  }, []);
-
   const handleExpandClick = (index) => {
     const updatedExpanded = [...expanded];
     updatedExpanded[index] = !updatedExpanded[index];
     setExpanded(updatedExpanded);
   };
 
-  const handleLikeClick = async (index, postId) => {
+  const handleLikeClick = async (postId) => {
     await toggleLike(postId);
     const isLiked = await likeCheck(postId);
     setLikes((prevLikes) => ({ ...prevLikes, [postId]: isLiked }));
+
+    const likedPosts = JSON.parse(localStorage.getItem('likedPosts')) || {};
+    likedPosts[postId] = isLiked;
+    localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
   };
 
   const handleLoadMore = () => {
@@ -84,24 +88,19 @@ const Posts = () => {
     const postLikesRef = ref(database, `posts/${postId}`);
 
     try {
-      const postLikesSnapshot = await get(postLikesRef);
-      const postLikes = postLikesSnapshot.val() || 0;
       if (!isLiked) {
       await update(postLikesRef, {
         likes: increment(1)
       });
-      console.log('+1')
     } else {
       await update(postLikesRef, {
         likes: increment(-1)
       });
-      console.log('-1')
     }
-    console.log('worked')}
+  }
     catch (error) {
       console.log(error)
     }
-  
     localStorage.setItem('likedPosts', JSON.stringify(updatedLikes));
     setLikes(updatedLikes);
   }
@@ -267,14 +266,9 @@ const Posts = () => {
 
   const styles = theme ? darkModeStyles : lightModeStyles;
 
-  const handleNewPost = () => {
-    addNewPost('1', 'description1', 'description2')
-  }
-
   const handleClosePopUp = () => {
     setPopUpOpen(false);
   };
-
 
   return (
     <div style={styles.backgroundColor}>
@@ -324,7 +318,7 @@ const Posts = () => {
                       bgcolor: likes[post.id] ? 'rgba(255, 0, 247, 0.150)' : 'transparent',
                     },
                   }}
-                  onClick={() => handleLikeClick(index, post.id)}
+                  onClick={() => handleLikeClick(post.id || post.id)}
                 >
                   <FavoriteIcon />
                 </IconButton>
