@@ -11,6 +11,8 @@ import Container from "@mui/material/Container";
 import { styled } from "@mui/material/styles";
 import { addNewPost } from "../firebaseConfig";
 import { useNavigate } from 'react-router-dom';
+import { useUserContext } from '../Contexts/UserContext'
+
 
 
 const ExpandMore = styled((props) => {
@@ -43,14 +45,20 @@ const CreateNewPost = () => {
         const updatedLiked = [...liked];
         updatedLiked[index] = !updatedLiked[index];
         setLiked(updatedLiked);
+        console.log('liked')
       };
 
       const navigate = useNavigate();
+      const {user} = useUserContext()
+    const [author, setAuthor] = useState(user.email)
+
 
       const handleNewPost = () => {
-        addNewPost(title, description, secondaryDescription)
+        addNewPost(title, description, secondaryDescription, author)
         navigate("/posts");
       }
+
+      console.log(user.email)
 
       const goBack = () => {
         navigate("/posts");
@@ -70,14 +78,14 @@ const CreateNewPost = () => {
         FormContainer: {
             display: "flex",
             flexDirection: "column",
-            position: "fixed",
+            position: "relative",
             left: "200px",
             top: "200px"
         },
         Container: {
             position: "relative",
-            left: "200px",
-            top: "110px"
+            left: "10%",
+            bottom: "11%"
         },
         textField: {
             marginBottom: "15px",
@@ -132,7 +140,9 @@ const CreateNewPost = () => {
               color: "white"
             },
             description: {
-              color: "darkgray"
+              color: "darkgray",
+                maxHeight: "300px",
+                overflowY: "scroll"
             }
           },
           postMenu: {
@@ -162,14 +172,14 @@ const CreateNewPost = () => {
         FormContainer: {
             display: "flex",
             flexDirection: "column",
-            position: "fixed",
+            position: "relative",
             left: "200px",
             top: "200px"
         },
         Container: {
             position: "relative",
-            left: "200px",
-            top: "110px"
+            left: "10%",
+            bottom: "11%",
         },
         textField: {
             marginBottom: "15px",
@@ -224,7 +234,9 @@ const CreateNewPost = () => {
               color: "black"
             },
             description: {
-              color: "darkgray"
+              color: "darkgray",
+                maxHeight: "300px",
+                overflowY: "scroll"
             }
           },
           postMenu: {
@@ -240,6 +252,8 @@ const CreateNewPost = () => {
           },
     };
 
+
+
     const styles = theme ? darkModeStyles : lightModeStyles;
 
     return (
@@ -251,6 +265,7 @@ const CreateNewPost = () => {
                 required
                 placeholder='Title'
                 value={title}
+                maxLength={67}
                 onChange={(e) => setTitle(e.target.value)}
             />
             <input
@@ -258,6 +273,7 @@ const CreateNewPost = () => {
                 required
                 placeholder='Description'
                 value={description}
+                maxLength={67}
                 onChange={(e) => setDescription(e.target.value)}
             />
             <input

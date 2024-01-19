@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Collapse from "@mui/material/Collapse";
@@ -14,12 +14,12 @@ import { useThemeContext } from "../Contexts/ThemeContext";
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
-import { database, onValue, ref } from "../firebaseConfig";
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import PopUp from "./CreateNewPost";
-import { likeCheck } from "../firebaseConfig";
-import { update, increment, get } from "firebase/database";
-
+import CircularProgress from '@mui/material/CircularProgress';
+import Fade from '@mui/material/Fade';
+import { database, onValue, ref } from "../firebaseConfig";
+import { update, increment } from 'firebase/database'
+import { useNavigate } from 'react-router-dom';
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -37,8 +37,10 @@ const Posts = () => {
   const [expanded, setExpanded] = useState([]);
   const [likes, setLikes] = useState({});
   const [postsAmount, setPostsAmount] = useState(5);
-  const [popUpOpen, setPopUpOpen] = useState(false);
   const { theme, changeTheme } = useThemeContext();
+  const [loading, setLoading] = useState(true);
+  const [renderedPosts, setRenderedPosts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const likedPosts = JSON.parse(localStorage.getItem('likedPosts'));
@@ -47,6 +49,7 @@ const Posts = () => {
 
   useEffect(() => {
     const postsRef = ref(database, "posts/");
+    setLoading(true);
 
     onValue(postsRef, (snapshot) => {
       const data = snapshot.val();
@@ -58,6 +61,7 @@ const Posts = () => {
         setPosts(postsArray);
         setExpanded(Array(postsArray.length).fill(false));
       }
+      setLoading(false);
     });
   }, []);
 
@@ -68,42 +72,43 @@ const Posts = () => {
   };
 
   const handleLikeClick = async (postId) => {
-    await toggleLike(postId);
-    const isLiked = await likeCheck(postId);
-    setLikes((prevLikes) => ({ ...prevLikes, [postId]: isLiked }));
-
-    const likedPosts = JSON.parse(localStorage.getItem('likedPosts')) || {};
-    likedPosts[postId] = isLiked;
-    localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
-  };
-
-  const handleLoadMore = () => {
-    setPostsAmount(postsAmount + 5)
+    try {
+      await toggleLike(postId);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const toggleLike = async (postId) => {
     const isLiked = likes[postId];
     const updatedLikes = { ...likes };
-  
-    const postLikesRef = ref(database, `posts/${postId}`);
 
     try {
-      if (!isLiked) {
+      const postLikesRef = ref(database, `posts/${postId}`);
+      const likesUpdate = isLiked ? increment(-1) : increment(1);
+
       await update(postLikesRef, {
-        likes: increment(1)
+        likes: likesUpdate,
       });
-    } else {
-      await update(postLikesRef, {
-        likes: increment(-1)
-      });
+
+      updatedLikes[postId] = !isLiked;
+    } catch (error) {
+      console.error(error);
     }
-  }
-    catch (error) {
-      console.log(error)
-    }
+
     localStorage.setItem('likedPosts', JSON.stringify(updatedLikes));
     setLikes(updatedLikes);
-  }
+  };
+
+  const seeMorePage = (postId, post) => {
+    navigate(`/post/${postId}`, { state: { post, postId, likes } });
+  };
+
+  const handleLoadMore = () => {
+    if (postsAmount < posts.length) {
+      setPostsAmount(postsAmount + 5);
+    }
+  };
 
   const lightModeStyles = {
     themeToggle: {
@@ -153,7 +158,23 @@ const Posts = () => {
         color: "black"
       },
       description: {
-        color: "darkgray"
+        color: "darkgray",
+        overflow: "hidden",
+        marginTop: "10px",
+        secondary: {
+          color: "darkgray",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          display: "-webkit-box",
+          WebkitBoxOrient: "horizontal",
+          maxHeight: "60px",
+          webkitLineClamp: "3"
+
+        },
+        seeMore: {
+          color: "rgb(205, 116, 212)",
+          cursor: "pointer"
+        }
       }
     },
     postMenu: {
@@ -169,7 +190,10 @@ const Posts = () => {
     },
     noPosts: {
       color: "black",
-      padding: 20
+      padding: 20,
+      textAlign: "center",
+      fontSize: "21px",
+      fontWeight: "900",
     },
     likeValue: {
       textAlign: "left",
@@ -182,6 +206,8 @@ const Posts = () => {
   const darkModeStyles = {
     backgroundColor: {
       backgroundColor: "#212121",
+      width: "100%",
+      minHeight: "100vh"
     },
     themeToggle: {
       position: "fixed",
@@ -238,7 +264,23 @@ const Posts = () => {
         color: "white"
       },
       description: {
-        color: "darkgray"
+        color: "darkgray",
+        overflow: "hidden",
+        marginTop: "10px",
+        secondary: {
+          color: "darkgray",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          display: "-webkit-box",
+          WebkitBoxOrient: "horizontal",
+          maxHeight: "60px",
+          webkitLineClamp: "3"
+
+        },
+        seeMore: {
+          color: "rgb(205, 116, 212)",
+          cursor: "pointer"
+        }
       }
     },
     postMenu: {
@@ -254,7 +296,11 @@ const Posts = () => {
     },
     noPosts: {
       color: "white",
-      padding: 20
+      padding: 20,
+      textAlign: "center",
+      fontSize: "21px",
+      fontWeight: "900",
+
     },
     likeValue: {
       textAlign: "left",
@@ -266,106 +312,115 @@ const Posts = () => {
 
   const styles = theme ? darkModeStyles : lightModeStyles;
 
-  const handleClosePopUp = () => {
-    setPopUpOpen(false);
-  };
 
   return (
     <div style={styles.backgroundColor}>
-      <IconButton style={styles.themeToggle} onClick={changeTheme}>
-        {theme ? <LightModeRoundedIcon /> : <DarkModeRoundedIcon />}
-      </IconButton>
-      <Link to={{ pathname: '/log-in' }}>
-        <LogoutRoundedIcon style={styles.logOutBtn} />
-      </Link>
-      <Link to={{ pathname: '/create-new-post' }}>
-        <AddRoundedIcon style={styles.addPostBtn} />
-      </Link>
-      <Container maxWidth="sm">
-        {popUpOpen ? <PopUp open={popUpOpen} onClose={handleClosePopUp} /> : console.log(popUpOpen)}
-
-        {posts.slice(0, postsAmount).map((post, index) => {
-          return (
-            <div key={index} style={styles.listContainer}>
-              <div>
-                <Card sx={styles.cardContainer}>
-                  <CardContent>
-                    <Typography variant="title" style={styles.cardContainer.title}>
-                      {post.title}
-                    </Typography>
-                    <Typography variant="body2" style={styles.cardContainer.description}>
-                      {post.mainDescription}
-                    </Typography>
-                  </CardContent>
-                  <Collapse in={expanded[index]} timeout="auto" unmountOnExit>
-                    <CardContent>
-                      <Typography variant="body2" style={styles.cardContainer.description}>
-                        {post.secondaryDescription}
-                      </Typography>
-                    </CardContent>
-                  </Collapse>
-                </Card>
-              </div>
-              <div style={styles.postMenu}>
-                <IconButton
-                  sx={{
-                    borderRadius: 2,
-                    border: 1,
-                    borderColor: likes[post.id] ? '#cd74d4' : '#c1c1c1',
-                    color: likes[post.id] ? "#cd74d4" : '#c1c1c1',
-                    bgcolor: likes[post.id] ? 'rgba(255, 0, 247, 0.050)' : 'transparent',
-                    "&:hover": {
-                      bgcolor: likes[post.id] ? 'rgba(255, 0, 247, 0.150)' : 'transparent',
-                    },
-                  }}
-                  onClick={() => handleLikeClick(post.id || post.id)}
-                >
-                  <FavoriteIcon />
-                </IconButton>
-                <ExpandMore
-                  expand={expanded[index]}
-                  onClick={() => handleExpandClick(index)}
-
-                  aria-expanded={expanded[index]}
-                  aria-label="show more"
-                  sx={{
-                    color: "#c1c1c1"
-                  }}>
-                  <ExpandMoreIcon />
-                </ExpandMore>
-              </div>
-              <h5 style={styles.likeValue}>{`${post.likes} Likes`}</h5>
-            </div>
-          );
-        })}
-        {postsAmount < posts.length ? (
-          <Button
-            sx={{
-              color: theme ? "#e0e0e0" : "#cd74d4",
-              bgcolor: theme ? "#424242" : "#fbf2fb",
-              border: 1,
-              borderColor: theme ? "#616161" : "#cd74d4",
-              marginTop: 2,
-              marginBottom: 2,
-              textAlign: 'center',
-              "&:hover": {
-                bgcolor: theme ? "#616161" : "#fbf2fb",
-              },
-            }}
-            variant="text"
-            onClick={handleLoadMore}
-
-          >
-            Load More
-          </Button>
-        ) : (
-          <Typography style={styles.noPosts}>
-            that's it bae
-          </Typography>
-        )}
-      </Container>
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <CircularProgress style={{ color: 'darkgray' }} />
+        </div>
+      ) : (
+        <>
+          <IconButton style={styles.themeToggle} onClick={changeTheme}>
+            {theme ? <LightModeRoundedIcon /> : <DarkModeRoundedIcon />}
+          </IconButton>
+          <Link to={{ pathname: '/log-in' }}>
+            <LogoutRoundedIcon style={styles.logOutBtn} />
+          </Link>
+          <Link to={{ pathname: '/create-new-post' }}>
+            <AddRoundedIcon style={styles.addPostBtn} />
+          </Link>
+          <Container maxWidth="sm">
+            {posts.map((post, index) => (
+              <Fade in={!loading} key={index}>
+                <div style={styles.listContainer}>
+                  <div>
+                    <Card sx={styles.cardContainer}>
+                      <CardContent>
+                        <Typography variant="title" style={styles.cardContainer.title}>
+                          {post.title}
+                        </Typography>
+                        <Typography variant="body2" style={styles.cardContainer.description}>
+                          {post.mainDescription}
+                        </Typography>
+                      </CardContent>
+                      <Collapse in={expanded[index]} timeout="auto" unmountOnExit>
+                        <CardContent>
+                          <Typography variant="body2" style={styles.cardContainer.description.secondary}>
+                            {post.secondaryDescription}
+                          </Typography>
+                          <Typography onClick={() => seeMorePage(post.id, post)} variant="body2" style={styles.cardContainer.description.seeMore}>
+                            See More
+                          </Typography>
+                        </CardContent>
+                      </Collapse>
+                    </Card>
+                  </div>
+                  <div style={styles.postMenu}>
+                    <IconButton
+                      sx={{
+                        borderRadius: 2,
+                        border: 1,
+                        borderColor: likes[post.id] ? '#cd74d4' : '#c1c1c1',
+                        color: likes[post.id] ? "#cd74d4" : '#c1c1c1',
+                        bgcolor: likes[post.id] ? 'rgba(255, 0, 247, 0.050)' : 'transparent',
+                        transition: "ease-in-out 0.3s",
+                        "&:hover": {
+                          bgcolor: likes[post.id] ? 'rgba(255, 0, 247, 0.150)' : 'transparent',
+                          color: likes[post.id] ? "#cd74d4" : "gray",
+                        },
+                      }}
+                      onClick={() => handleLikeClick(post.id)}
+                    >
+                      <FavoriteIcon />
+                    </IconButton>
+                    <ExpandMore
+                      expand={expanded[index]}
+                      onClick={() => handleExpandClick(index)}
+                      aria-expanded={expanded[index]}
+                      aria-label="show more"
+                      sx={{
+                        color: "#c1c1c1"
+                      }}
+                    >
+                      <ExpandMoreIcon />
+                    </ExpandMore>
+                  </div>
+                  <h5 style={styles.likeValue}>{`${post.likes} Likes`}</h5>
+                </div>
+              </Fade>
+            ))}
+            {postsAmount < posts.length && (
+              <Button
+                sx={{
+                  color: theme ? "#e0e0e0" : "#cd74d4",
+                  bgcolor: theme ? "#424242" : "#fbf2fb",
+                  border: 1,
+                  borderColor: theme ? "#616161" : "#cd74d4",
+                  marginTop: 2,
+                  marginBottom: 2,
+                  textAlign: 'center',
+                  "&:hover": {
+                    bgcolor: theme ? "#616161" : "#fbf2fb",
+                  },
+                }}
+                variant="text"
+                onClick={handleLoadMore}
+              >
+                Load More
+              </Button>
+            )}
+            {postsAmount >= posts.length && posts.length === 0 && (
+              <Typography style={styles.noPosts}>
+                <img src="../src/imgs/doggie.png" alt="No posts yet" />
+                <p style={styles.noPosts}>no posts yet :(</p>
+              </Typography>
+            )}
+          </Container>
+        </>
+      )}
     </div>
   );
-};
+}
 
 export default Posts;

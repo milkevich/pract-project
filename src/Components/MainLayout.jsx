@@ -1,13 +1,16 @@
 import React from 'react'
 import { useUserContext } from '../Contexts/UserContext'
 import { Outlet } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
 
 export const MainLayout = () => {
     const { isInitialized } = useUserContext();
 
     return (
         !isInitialized ? (
-            <div style={{ width: '100vw', height: '100vh', position: 'fixed', background: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>Loading...</div>
-        ) : <Outlet/>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress style={{ color: 'darkgray' }} />
+            </div>
+        ) : <Outlet />
     )
 }
