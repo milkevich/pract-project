@@ -101,7 +101,7 @@ const Posts = () => {
   };
 
   const seeMorePage = (postId, post) => {
-    navigate(`/post/${postId}`, { state: { post, postId, likes } });
+    navigate(`/post/${postId}`, { state: { post, postId, likes, } });
   };
 
   const handleLoadMore = () => {

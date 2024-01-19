@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../firebaseConfig';
 
@@ -29,6 +29,7 @@ function LogIn() {
           const errorCode = error.code;
           const errorMessage = error.message;
           console.log(error)
+          alert('Something went wrong, please try again')
         });
     }
   };
@@ -65,7 +66,7 @@ function LogIn() {
   }
 
   return (
-    <div>
+    <div style={{maxWidth: "50vh", margin: "auto"}}>
       <CssBaseline />
       <Container maxWidth="sm">
         <TextField

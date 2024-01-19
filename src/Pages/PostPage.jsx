@@ -10,6 +10,8 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { useNavigate } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grow from '@mui/material/Grow';
+import { useUserContext } from '../Contexts/UserContext';
+
 
 const PostPage = () => {
     const { theme } = useThemeContext();
@@ -18,7 +20,8 @@ const PostPage = () => {
     const [postLikes, setPostLikes] = useState();
     const [likesLoading, setLikesLoading] = useState(true);
     const [checked, setChecked] = useState(false);
-    const [postContent, setPostContent] = useState({});
+
+    const { user } = useUserContext();
 
 
     const post = location.state.post;
@@ -26,11 +29,9 @@ const PostPage = () => {
 
     useEffect(() => {
         const likedPosts = JSON.parse(localStorage.getItem('likedPosts'));
-        const storedContent = JSON.parse(localStorage.getItem('postContent'));
 
         setLikesLoading(true);
         setLikes(likedPosts || {});
-        setPostContent(storedContent || {});
 
         const postLikesRef = ref(database, `posts/${location.state.postId}`);
         onValue(postLikesRef, (snapshot) => {
@@ -63,28 +64,6 @@ const PostPage = () => {
         setLikes(updatedLikes);
     };
 
-    const updateContent = async (postId, updatedContent) => {
-        try {
-            const postContentRef = ref(database, `posts/${postId}`);
-            await update(postContentRef, updatedContent);
-            setPostContent(updatedContent);
-        } catch (error) {
-            console.error(error);
-        }
-
-        localStorage.setItem('postContent', JSON.stringify(updatedContent));
-    };
-
-    const handleSaveEdit = (updatedPost) => {
-        const updatedContent = {
-            title: updatedPost.title,
-            mainDescription: updatedPost.mainDescription,
-            secondaryDescription: updatedPost.secondaryDescription,
-        };
-
-        updateContent(post.id, updatedContent);
-    };
-
     const handleLikeClick = async (postId) => {
         try {
             await toggleLike(postId);
@@ -100,7 +79,6 @@ const PostPage = () => {
     const handleEditClick = () => {
         navigate(`/post/${post.id}/edit`, {
             state: { post },
-            handleSaveEdit,
         });
     };
 
@@ -262,6 +240,7 @@ const PostPage = () => {
                             >
                                 <FavoriteIcon />
                             </IconButton>
+                            {user && post.author === user.email && ( 
                             <ModeEditIcon
                                 sx={{
                                     marginTop: '10px',
@@ -275,7 +254,7 @@ const PostPage = () => {
                                     },
                                 }}
                                 onClick={handleEditClick}
-                            />
+                            /> )}
                         </div>
 
                         <h5 style={styles.likeValue}>{`${postLikes} Likes`}</h5>
