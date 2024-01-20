@@ -10,6 +10,7 @@ import { MainLayout } from './Components/MainLayout';
 import CreateNewPost from './Pages/CreateNewPost';
 import PostPage from './Pages/PostPage';
 import Edit from '../src/Pages/Edit'
+import SignIn from './Pages/SignIn';
 
 const router = createBrowserRouter(
   
@@ -17,6 +18,7 @@ const router = createBrowserRouter(
     <Route path='/' element={<App />}>
       <Route element={<MainLayout />}>
         <Route path='/log-in' element={<LogIn />} />
+        <Route path='/sign-in' element={<SignIn />} />
         <Route path='/posts' element={<Posts />} />
         <Route path={`/post/:postId`} element={<PostPage />} />
         <Route path={`/post/:postId/edit`} element={<Edit />} />

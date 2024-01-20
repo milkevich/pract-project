@@ -240,21 +240,21 @@ const PostPage = () => {
                             >
                                 <FavoriteIcon />
                             </IconButton>
-                            {user && post.author === user.email && ( 
-                            <ModeEditIcon
-                                sx={{
-                                    marginTop: '10px',
-                                    marginRight: '15px',
-                                    fontSize: '21px',
-                                    color: 'darkgray',
-                                    cursor: 'pointer',
-                                    transition: 'ease-in-out 0.3s',
-                                    '&:hover': {
-                                        color: 'gray',
-                                    },
-                                }}
-                                onClick={handleEditClick}
-                            /> )}
+                            {user && post.author === user.email && (
+                                <ModeEditIcon
+                                    sx={{
+                                        marginTop: '10px',
+                                        marginRight: '15px',
+                                        fontSize: '21px',
+                                        color: 'darkgray',
+                                        cursor: 'pointer',
+                                        transition: 'ease-in-out 0.3s',
+                                        '&:hover': {
+                                            color: 'gray',
+                                        },
+                                    }}
+                                    onClick={handleEditClick}
+                                />)}
                         </div>
 
                         <h5 style={styles.likeValue}>{`${postLikes} Likes`}</h5>
