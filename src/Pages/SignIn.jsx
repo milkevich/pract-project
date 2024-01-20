@@ -72,10 +72,7 @@ function SignIn() {
   }
 
   return (
-    <div style={{maxWidth: "44vh", margin: "auto"}}>
-      <CssBaseline />
-      <Container maxWidth="sm">
-        <h1 style={{textAlign: "center", marginBottom: "-80px"}}>Sign In Here</h1>
+    <div style={{maxWidth: '300px', margin: 'auto'}}>
         <TextField
           error={emailError}
           helperText={emailErrorMessage}
@@ -83,7 +80,7 @@ function SignIn() {
           onChange={emailValidation}
           value={email}
           required
-          sx={{ position: 'relative', marginTop: '100px', width: '300px' }}
+          sx={{ marginTop: '100px', width: '300px' }}
           label="Email"
           variant="outlined"
         />
@@ -92,7 +89,7 @@ function SignIn() {
           helperText={passwordErrorMessage}
           type="password"
           required
-          sx={{ position: 'relative', marginTop: '20px', width: '300px' }}
+          sx={{ marginTop: '20px', width: '300px' }}
           id="outlined-basic"
           label="Password"
           variant="outlined"
@@ -100,18 +97,17 @@ function SignIn() {
         />
         <Button
           onClick={submit}
-          sx={{ position: 'relative', marginTop: '20px', width: '300px' }}
+          sx={{ marginTop: '20px', width: '300px' }}
           variant="contained">
           Sign In
         </Button>
         <Button
           onClick={goToPosts}
-          sx={{ position: 'relative', marginTop: '20px', width: '300px' }}
+          sx={{ marginTop: '20px', width: '300px' }}
           variant="text">
               Go Back 
         </Button>
         <p style={{textAlign: "center"}}>Already have an account? <span onClick={logIn} style={{color: "#cd74d4", cursor: "pointer"}}>Log in here</span></p>
-      </Container>
     </div>
   );
 }

@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grow from '@mui/material/Grow';
 import { useUserContext } from '../Contexts/UserContext';
-
+import Avatar from '@mui/material/Avatar';
 
 const PostPage = () => {
     const { theme } = useThemeContext();
@@ -83,8 +83,11 @@ const PostPage = () => {
     };
 
     const darkModeStyles = {
+        background: {
+            backgroundColor: "#212121",
+        },
         container: {
-            maxWidth: "51%",
+            maxWidth: "100vh",
             minHeight: "95vh",
             margin: "auto",
             display: "flex",
@@ -93,7 +96,7 @@ const PostPage = () => {
             padding: "20px",
             paddingLeft: "40px",
             paddingRight: "40px",
-            backgroundColor: "#212121"
+            backgroundColor: "#212121",
         },
         header: {
             textAlign: "left",
@@ -102,19 +105,18 @@ const PostPage = () => {
                 fontSize: "42px",
                 fontWeight: "900",
                 letterSpacing: "-0.11rem",
-                color: "white",
-                wordBreak: "break-word"
+                color: "white"
             },
             author: {
-                marginBottom: "20px",
+                marginBottom: "10px",
                 marginTop: "-30px",
-                color: "darkgray",
+                color: "white",
+                display: "flex",
             }
         },
         postMenu: {
             display: "flex",
             justifyContent: "space-between",
-            border: 1,
             border: "solid",
             borderColor: "#616161",
             backgroundColor: "#424242",
@@ -126,23 +128,24 @@ const PostPage = () => {
             textAlign: "left",
             margin: 0,
             marginTop: "10px",
-            color: "white"
+            color: "white",
+        },
+        description: {
+            marginBottom: "50px",
+            marginTop: "-30px",
+            color: "white",
+            fontWeight: "600"
         },
         mainContent: {
+            wordBreak: "break-word",
             color: "white",
-            paddingBottom: "120px"
+            marginTop: "20px"
         },
-        background: {
-            backgroundColor: "#212121",
-            width: "100%",
-            hieght: "100%"
-        }
     };
-
 
     const lightModeStyles = {
         container: {
-            maxWidth: "51%",
+            maxWidth: "100vh",
             minHeight: "95vh",
             margin: "auto",
             display: "flex",
@@ -151,7 +154,6 @@ const PostPage = () => {
             padding: "20px",
             paddingLeft: "40px",
             paddingRight: "40px",
-            marginBottom: "120px",
         },
         header: {
             textAlign: "left",
@@ -160,11 +162,11 @@ const PostPage = () => {
                 fontSize: "42px",
                 fontWeight: "900",
                 letterSpacing: "-0.11rem",
-                wordBreak: "break-word"
             },
             author: {
-                marginBottom: "20px",
+                marginBottom: "10px",
                 marginTop: "-30px",
+                display: "flex",
             }
         },
         postMenu: {
@@ -184,7 +186,19 @@ const PostPage = () => {
             marginTop: "10px",
             color: "black"
         },
+        description: {
+            marginBottom: "50px",
+            marginTop: "-30px",
+            color: "#616161",
+            fontWeight: "600"
+        },
+        mainContent: {
+            wordBreak: "break-word",
+            marginTop: "20px"
+        }
     };
+
+    const firstInitial = post.author[0].toUpperCase()
 
     const styles = theme ? darkModeStyles : lightModeStyles;
 
@@ -220,7 +234,13 @@ const PostPage = () => {
                                 />
                                 {post.title}
                             </p>
-                            <p style={styles.header.author}>By {post.author}</p>
+                            <p style={styles.description}>{post.mainDescription}</p>
+                            <p style={styles.header.author}>
+                                <Avatar sx={{ width: 36, height: 36 }}>
+                                    {firstInitial}
+                                </Avatar> 
+                                <span style={{marginTop: "7px", marginLeft: "10px"}}>{post.author}</span>
+                            </p>
                         </div>
                         <div style={styles.postMenu}>
                             <IconButton
@@ -257,11 +277,10 @@ const PostPage = () => {
                                 />)}
                         </div>
 
-                        <h5 style={styles.likeValue}>{`${postLikes} Likes`}</h5>
+                        <h5 style={styles.likeValue}>{`${postLikes.toLocaleString()}`} <span style={{fontWeight: "500"}}>People liked this post</span></h5>
 
-                        <div style={styles.mainContent}>
-                            <p>{post.mainDescription}</p>
-                            <p>{post.secondaryDescription}</p>
+                        <div  style={styles.mainContent}>
+                        <div dangerouslySetInnerHTML={{ __html: post.secondaryDescription.replace(/\n/g, '<br>') }}></div>
                         </div>
                     </div>
                 </Grow>

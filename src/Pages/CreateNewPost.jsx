@@ -33,7 +33,7 @@ const CreateNewPost = () => {
     const [liked, setLiked] = useState([]);
     const [title, setTitle] = useState('Title');
     const [description, setDescription] = useState('Description');
-    const [secondaryDescription, setSecondaryDescription] = useState('');
+    const [secondaryDescription, setSecondaryDescription] = useState('Secondary Description');
 
     const handleExpandClick = (index) => {
         const updatedExpanded = [...expanded];
@@ -50,12 +50,17 @@ const CreateNewPost = () => {
 
       const navigate = useNavigate();
       const {user} = useUserContext()
-    const [author, setAuthor] = useState(user.email)
+      const [author, setAuthor] = useState(user.email)
 
 
       const handleNewPost = () => {
-        addNewPost(title, description, secondaryDescription, author)
-        navigate("/posts");
+        if (!title || !description || !secondaryDescription) {
+          alert("You have to fill in all the forms.");
+          return;
+        } else {
+          addNewPost(title, description, secondaryDescription, author)
+          navigate("/posts");
+        }
       }
 
       console.log(user.email)
@@ -64,7 +69,7 @@ const CreateNewPost = () => {
         navigate("/posts");
       }
 
-    const darkModeStyles = {
+      const darkModeStyles = {
         popUp: {
             backgroundColor: "#212121",
             width: "100vw",
@@ -80,12 +85,14 @@ const CreateNewPost = () => {
             flexDirection: "column",
             position: "relative",
             left: "200px",
-            top: "200px"
+            top: "100px"
         },
         Container: {
             position: "relative",
             left: "10%",
-            bottom: "11%"
+            bottom: "60%",
+            wordBreak: "break-word"
+
         },
         textField: {
             marginBottom: "15px",
@@ -96,7 +103,21 @@ const CreateNewPost = () => {
             backgroundColor: "#424242",
             color: "white",
             outline: "none",
-            padding: "15px"
+            padding: "15px",
+            wordBreak: "break-word"
+        },
+        textArea: {
+            marginBottom: "15px",
+            width: "300px",
+            height: "300px",
+            border: "1px solid",
+            borderRadius: "5px",
+            borderColor: "#616161",
+            backgroundColor: "#424242",
+            color: "white",
+            outline: "none",
+            padding: "15px",
+            wordBreak: "break-word"
         },
         btn: {
             width: "145px",
@@ -137,15 +158,15 @@ const CreateNewPost = () => {
             backgroundColor: '#424242',
             boxShadow: "none",
             title: {
-              color: "white"
+                color: "white"
             },
             description: {
-              color: "darkgray",
-                maxHeight: "300px",
-                overflowY: "scroll"
-            }
-          },
-          postMenu: {
+                color: "darkgray",
+                maxHeight: "400px",
+                overflowY: "scroll",
+            },
+        },
+        postMenu: {
             display: "flex",
             justifyContent: "space-between",
             border: 1,
@@ -155,9 +176,9 @@ const CreateNewPost = () => {
             padding: 5,
             borderRadius: 12,
             marginTop: 10,
-          },
+        },
     };
-
+    
     const lightModeStyles = {
         popUp: {
             backgroundColor: "white",
@@ -174,12 +195,13 @@ const CreateNewPost = () => {
             flexDirection: "column",
             position: "relative",
             left: "200px",
-            top: "200px"
+            top: "100px",
+            wordBreak: "break-all"
         },
         Container: {
             position: "relative",
             left: "10%",
-            bottom: "11%",
+            bottom: "60%",
         },
         textField: {
             marginBottom: "15px",
@@ -191,6 +213,19 @@ const CreateNewPost = () => {
             color: "gray",
             outline: "none",
             padding: "15px"
+        },
+        textArea: {
+            marginBottom: "15px",
+            width: "300px",
+            height: "300px",
+            border: "1px solid",
+            borderRadius: "5px",
+            borderColor: "#616161",
+            backgroundColor: "white",
+            color: "gray",
+            outline: "none",
+            padding: "15px",
+            whiteSpace: "pre-line", 
         },
         btn: {
             width: "145px",
@@ -229,13 +264,14 @@ const CreateNewPost = () => {
             borderRadius: 3,
             borderColor: '#c1c1c1',
             backgroundColor: 'white',
+            maxHeight: "500px",
             boxShadow: "none",
             title: {
               color: "black"
             },
             description: {
               color: "darkgray",
-                maxHeight: "300px",
+                maxHeight: "400px",
                 overflowY: "scroll"
             }
           },
@@ -251,8 +287,6 @@ const CreateNewPost = () => {
             marginTop: 10,
           },
     };
-
-
 
     const styles = theme ? darkModeStyles : lightModeStyles;
 
@@ -273,13 +307,15 @@ const CreateNewPost = () => {
                 required
                 placeholder='Description'
                 value={description}
-                maxLength={67}
+                maxLength={200}
                 onChange={(e) => setDescription(e.target.value)}
             />
-            <input
-                style={styles.textField}
+            <textarea
+
+                style={styles.textArea}
                 placeholder='Secondary description (Optional)'
                 value={secondaryDescription}
+                type='messege'
                 onChange={(e) => setSecondaryDescription(e.target.value)}
             />
                 <br />

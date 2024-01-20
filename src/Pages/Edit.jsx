@@ -184,16 +184,29 @@ const Edit = () => {
             flexDirection: "column",
             position: "relative",
             left: "200px",
-            top: "200px"
+            top: "100px",
+            wordBreak: "break-all"
         },
         Container: {
             position: "relative",
             left: "10%",
-            bottom: "11%",
+            bottom: "60%",
         },
         textField: {
             marginBottom: "15px",
             width: "300px",
+            border: "1px solid",
+            borderRadius: "5px",
+            borderColor: "#616161",
+            backgroundColor: "white",
+            color: "gray",
+            outline: "none",
+            padding: "15px"
+        },
+        textArea: {
+            marginBottom: "15px",
+            width: "300px",
+            height: "300px",
             border: "1px solid",
             borderRadius: "5px",
             borderColor: "#616161",
@@ -239,17 +252,19 @@ const Edit = () => {
             borderRadius: 3,
             borderColor: '#c1c1c1',
             backgroundColor: 'white',
+            maxHeight: "500px",
             boxShadow: "none",
             title: {
-                color: "black"
+              color: "black"
             },
             description: {
-                color: "darkgray",
-                maxHeight: "300px",
-                overflowY: "scroll"
+              color: "darkgray",
+                maxHeight: "400px",
+                overflowY: "scroll",
+                wordBreak: "break-word"
             }
-        },
-        postMenu: {
+          },
+          postMenu: {
             display: "flex",
             justifyContent: "space-between",
             border: 1,
@@ -259,7 +274,7 @@ const Edit = () => {
             padding: 5,
             borderRadius: 12,
             marginTop: 10,
-        },
+          },
     };
 
     const styles = theme ? darkModeStyles : lightModeStyles;
@@ -290,8 +305,8 @@ const Edit = () => {
                         onChange={(e) => handleInputChange(e, 'mainDescription')}
                         name="mainDescription"
                     />
-                    <input
-                        style={styles.textField}
+                    <textarea
+                        style={styles.textArea}
                         placeholder='Secondary description (Optional)'
                         value={editedPost.secondaryDescription}
                         onChange={(e) => handleInputChange(e, 'secondaryDescription')}
