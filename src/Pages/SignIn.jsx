@@ -4,12 +4,12 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../firebaseConfig';
 
 
 
-function LogIn() {
+function SignIn() {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState('');
@@ -22,8 +22,9 @@ function LogIn() {
   const submit = async (e) => {
     e.preventDefault();
     if (!emailError || !passwordError) {
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
           navigate('/posts')
         })
         .catch((error) => {
@@ -66,8 +67,8 @@ function LogIn() {
     navigate("/posts")
   }
 
-  const SignIn = () => {
-    navigate('/sign-in')
+  const logIn = () => {
+    navigate('/log-in')
   }
 
   return (
@@ -98,7 +99,7 @@ function LogIn() {
           onClick={submit}
           sx={{ marginTop: '20px', width: '300px' }}
           variant="contained">
-          Log In
+          Sign In
         </Button>
         <Button
           onClick={goToPosts}
@@ -106,9 +107,9 @@ function LogIn() {
           variant="text">
               Go Back 
         </Button>
-        <p style={{textAlign: "center"}}>Don't have an account? <span onClick={SignIn} style={{color: "#cd74d4", cursor: "pointer"}}>Sign in here</span></p>
+        <p style={{textAlign: "center"}}>Already have an account? <span onClick={logIn} style={{color: "#cd74d4", cursor: "pointer"}}>Log in here</span></p>
     </div>
   );
 }
 
-export default LogIn;
+export default SignIn;
